@@ -2,14 +2,58 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <!--Favicons-->
+
   <meta name="msapplication-TileColor" content="#00853d">
   <meta name="theme-color" content="#ffffff">
 
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+  
+  <script src="sha256_unicode.js" type="text/javascript">
+	//need to hash custom seed-words (including unicode-words), and hash previous specified custom password,
+	//to get privkey (seed), from some another phrase, that is not a mnemonic-seed.
+	//(this password + phrase) = brainwallet, which is easier to remember, than mnemonic-seed.
+  </script>
+
+  <script type="text/javascript">
+	var custom_password = 'super-secret password to change seeds from the same keywords';
+	//This password need just to get different seed from the same phrase.
+	//Change this password, for your own brainwallet, which can working locally.
+  </script>
+
 </head>
-<body onload="js:genwallet(null)">
+<body onload="js:genwallet(document.getElementById('mnDictLangValue').value)">
+	
+	<center id="additional_params" style="display:block;">
+		<!-- Select lang-value (mnemonic dictionary) -->
+		<label for="mnDictLangValue" style="display:block;">
+			<span>Select the dictionary for mnemonic seed-phrase (lang-value):</span>
+			<select id="mnDictLangValue">
+				<option value="english">English (Monero default)</option>
+				<option value="electrum">Electrum (Aeon default)</option>
+				<option value="spanish">Spanish</option>
+				<option value="portuguese">Portuguese</option>
+				<option value="japanese">Japanese</option>
+			</select>
+		</label>
+	
+		<!-- Enter config for custom coin -->
+		<form>
+			<div>
+				<input type="checkbox" id="use_custom_config" onclick="document.getElementById('custom_config').style.display=( ( document.getElementById('custom_config').style.display === 'block' ) ? 'none' : 'block' );">
+				<label for="use_custom_config">Use custom coin config?</label>
+			</div>
+			<div id="custom_config" style="display:none;">
+				<input type="number"	id="addressPrefix"		value="830774"		title="addressPrefix">	<br>
+				<input type="text"		id="coinName" 			value="SatoriGold"	title="coinName">		<br>
+				<input type="text"		id="coinSymbol"			value="SAU"			title="coinSymbol">		<br>
+				<input type="number"	id="coinUnitPlaces"		value="9"			title="coinUnitPlaces">	<br>
+				<input type="text"		id="coinUriPrefix"		value="xau:"		title="coinUriPrefix">	<br>
+				<input type="button"	onclick="js:void(0); updateConfig();" 		value="Set this config!"	>
+			</div>
+		</form>
+	</center>
+
   <div class="wallet">
     <img src="keys.png"/>
     <div class="amount-added-text">Seed</div>
@@ -42,17 +86,25 @@
       </ul>
     </div>
   </div>
-  <div class="buttons">
-    <button type="button" onclick="js:genwallet(null)">Generate new</button>
-    <button type="button" onClick="window.print()">Print</button>
+  <div class="buttons" id="buttons" style="display:block;">
+    <button type="button" onclick="js:genwallet(document.getElementById('mnDictLangValue').value)">Generate new</button>
+    <button type="button" onClick="hide_for_print(); window.print();">Print</button>
     <center>
-      <button class="btn btn-default" onclick="js:show_restore();" type="button" value="restore keys from seed phrase">Restore keys from seed phrase</button>
+      <button class="btn btn-default" onclick="js:show_restore();" type="button" value="restore keys from seed phrase">Restore keys</button>
     </center>
     <div id="restore" style="display: none;">
-      <input id="seed_phrase" type="text" style="width:33%;" value="" placeholder="Enter your seed phrase words here."/><br /><br />
-      <center>
-        <button class="btn btn-default" onclick="js:restore_keys(null);" type="button" value="Restore keys">Restore Keys</button>
-      </center>
+      <input id="seed_phrase" type="text" style="width:33%;" value="" placeholder="Enter your seed." title="
+Enter the:
+mnemonic seed-phrase words here (select correct lang-value, at first),
+or SpendKey (reduced seed),
+or secret_phrase (to get seed from hash of this, and reduse it, then),
+or any 32-bytes hex (64 hexadecimal characters),
+for example - hash-value of 'sha256(sha256(secret_phrase)+sha256(custom_password))'.
+
+The 'custom_password'-value is hardcoded inside script of index.html,
+and this value can be changed for custom brainwallet.
+..."/>
+      <button class="btn btn-default" onclick="js:restore_keys(null, document.getElementById('mnDictLangValue').value);" type="button" value="Restore keys">Restore it now!</button>
     </div>
   </div>
   <div class="instruction">
@@ -94,5 +146,6 @@
     <script src="wallet.js"></script>
       <script src="crypto_utils.js"></script>
   <script src="qrcode.js"></script>
+  <center><p><a href="https://github.com/satorigold/SatoriGold-paperwallet/archive/master.zip"><font color="darkcyan" id="zip_link">Download this as zip-archive.</font></a></p></center>
 </body>
 </html>

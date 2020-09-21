@@ -1623,6 +1623,8 @@ return{_strlen:lb,_ge_mul8:Va,_keccak:db,_ge_scalarmult:Ta,_ge_fromfe_frombytes_
 
 
 var salt = '4721283fee2db41e1f2fc50ea9f6d783'; // IMPORTANT: never change it, otherwise it will be impossible to restore previously generated wallets!
+
+//default config - SatoriGold.
 var config = {
     coinUnitPlaces: 9,
     coinSymbol: 'SAU',
@@ -1630,6 +1632,8 @@ var config = {
     coinUriPrefix: 'xau:',
     addressPrefix: 830774
 };
+//Update config:	cnUtil.update_config( {    coinUnitPlaces: 9,    coinSymbol: 'SAU',    coinName: 'SatoriAurum',    coinUriPrefix: 'xau:',    addressPrefix: 830774	} );
+
 var cnUtil = (function(initConfig) {
     //var config = $.extend({}, initConfig);
     var config = initConfig;
@@ -1663,6 +1667,13 @@ var cnUtil = (function(initConfig) {
         GE_DSMP: 160 * 8, // ge_cached * 8
         SIGNATURE: 64 // ec_scalar * 2
     };
+
+	this.update_config = function(new_config){	//update config (as json-object) for custom coin
+		console.log('config', config, '\n'+		'new_config', new_config);
+		config = new_config;
+		config.coinUnits = new JSBigInt(10).pow(config.coinUnitPlaces);
+		CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = config.addressPrefix;
+	}
 
     this.valid_hex = function(hex) {
         return /[0-9a-fA-F]+/.test(hex);
